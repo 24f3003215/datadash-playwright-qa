@@ -5,29 +5,25 @@ const { chromium } = require('playwright');
   const page = await browser.newPage();
 
   let totalSum = 0;
-
   const seeds = [84,85,86,87,88,89,90,91,92,93];
 
   for (const seed of seeds) {
-    const url = `https://example.com/seed-${seed}`;  // Replace with real URL
-    console.log(`Visiting: ${url}`);
-    
+    const url = `https://sanand0.github.io/tdsdata/js_table/?seed=${seed}`;
     await page.goto(url, { waitUntil: 'networkidle' });
 
+    await page.waitForSelector('table');
+
     const numbers = await page.$$eval('table td', cells =>
-      cells.map(td => parseFloat(td.innerText))
-           .filter(n => !isNaN(n))
+      cells
+        .map(td => parseFloat(td.innerText.replace(/,/g, '').trim()))
+        .filter(n => !isNaN(n))
     );
 
-    const pageSum = numbers.reduce((a, b) => a + b, 0);
-    console.log(`Seed ${seed} sum: ${pageSum}`);
-
-    totalSum += pageSum;
+    totalSum += numbers.reduce((a, b) => a + b, 0);
   }
 
-  console.log("=================================");
-  console.log(`FINAL TOTAL SUM: ${totalSum}`);
-  console.log("=================================");
+  // 👇 THIS IS CRITICAL
+  console.log(`TOTAL_SUM=${totalSum}`);
 
   await browser.close();
 })();
